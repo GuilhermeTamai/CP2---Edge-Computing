@@ -126,8 +126,4 @@ Sem necessidade de processamento externo ou nuvem.
 4. Fazer upload do código
 ```
 
----
 
-## Licença
-
-Projeto acadêmico desenvolvido para a disciplina de **Edge Computing**.
