@@ -4,6 +4,20 @@
 
 ---
 
+## Demonstração do Projeto
+
+### Simulação no Wokwi
+
+🔗 [Acessar Simulação](https://wokwi.com/projects/464304148305328129)
+
+<br>
+
+### Circuito Físico
+
+<p align="center">
+  <img src="./fotocircuito.png" width="60%"/>
+</p>
+
 ## Descrição do Projeto
 
 Projeto desenvolvido com ESP32 utilizando Bluetooth, servomotores, laser e sensor LDR para controlar uma mira automatizada.
