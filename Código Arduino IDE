@@ -1,0 +1,176 @@
+//O código não irá funcionar pois o wokwi não tem Bluetooth
+ 
+ 
+#include "BluetoothSerial.h"
+ 
+#include <ESP32Servo.h>
+ 
+// Pinos
+ 
+const int PIN_H = 14;
+ 
+const int PIN_V = 12;
+ 
+const int PIN_LASER = 26;
+ 
+const int PIN_LDR = 34;
+ 
+BluetoothSerial SerialBT;
+ 
+Servo servoH;
+ 
+Servo servoV;
+ 
+int posH = 90;
+ 
+int posV = 90;
+ 
+const int step = 10;
+ 
+unsigned long travaTempo = 0;
+ 
+bool sistemaTravado = false;
+ 
+void setup() {
+ 
+  Serial.begin(115200);
+ 
+  SerialBT.begin("BT_BigSixV2");
+ 
+  servoH.attach(PIN_H);
+ 
+  servoV.attach(PIN_V);
+ 
+  // Inicia em 90 graus
+ 
+  servoH.write(posH);
+ 
+  servoV.write(posV);
+ 
+  pinMode(PIN_LASER, OUTPUT);
+ 
+  digitalWrite(PIN_LASER, LOW);
+ 
+  Serial.println("Sistema iniciado. Aguardando comandos Bluetooth...");
+ 
+}
+ 
+void loop() {
+ 
+  // Lógica do LDR (Trava por 10 segundos)
+ 
+  int valorLDR = analogRead(PIN_LDR);
+ 
+  if (valorLDR > 2500 && !sistemaTravado) {
+ 
+    Serial.print("ALVO ATINGIDO! Valor LDR: ");
+ 
+    Serial.println(valorLDR);
+ 
+    Serial.println("Travando sistema por 10 segundos...");
+ 
+    posH = 90;
+ 
+    posV = 90;
+ 
+    servoH.write(posH);
+ 
+    servoV.write(posV);
+ 
+    digitalWrite(PIN_LASER, LOW);
+ 
+    sistemaTravado = true;
+ 
+    travaTempo = millis();
+ 
+  }
+ 
+  if (sistemaTravado) {
+ 
+    if (millis() - travaTempo > 10000) {
+ 
+      sistemaTravado = false;
+ 
+      Serial.println("Sistema Liberado!");
+ 
+    }
+ 
+    return;
+ 
+  }
+ 
+  // Controle Bluetooth
+ 
+  if (SerialBT.available()) {
+ 
+    char cmd = SerialBT.read();
+ 
+    Serial.print("Comando Recebido: ");
+ 
+    Serial.print(cmd);
+ 
+    // Mapeamento para o app de carrinho (F, B, L, R, V)
+ 
+    if (cmd == 'F') {
+ 
+       if (posV + step <= 180) posV += step;
+ 
+       servoV.write(posV);
+ 
+       Serial.print(" -> Subir: "); Serial.println(posV);
+ 
+    }
+ 
+    else if (cmd == 'B') {
+ 
+       if (posV - step >= 0) posV -= step;
+ 
+       servoV.write(posV);
+ 
+       Serial.print(" -> Descer: "); Serial.println(posV);
+ 
+    }
+ 
+    else if (cmd == 'R') {
+ 
+       if (posH + step <= 180) posH += step;
+ 
+       servoH.write(posH);
+ 
+       Serial.print(" -> Direita: "); Serial.println(posH);
+ 
+    }
+ 
+    else if (cmd == 'L') {
+ 
+       if (posH - step >= 0) posH -= step;
+ 
+       servoH.write(posH);
+ 
+       Serial.print(" -> Esquerda: "); Serial.println(posH);
+ 
+    }
+ 
+    else if (cmd == 'V' || cmd == 'W') {
+ 
+       Serial.println(" -> DISPARANDO LASER!");
+ 
+       digitalWrite(PIN_LASER, HIGH);
+ 
+       delay(1000);
+ 
+       digitalWrite(PIN_LASER, LOW);
+ 
+    }
+ 
+    else {
+ 
+       Serial.println(" -> Comando não reconhecido.");
+ 
+    }
+ 
+  }
+ 
+}
+ 
+ 
