@@ -18,6 +18,8 @@
   <img src="./fotocircuito.png" width="60%"/>
 </p>
 
+---
+
 ## Descrição do Projeto
 
 Projeto desenvolvido com ESP32 utilizando Bluetooth, servomotores, laser e sensor LDR para controlar uma mira automatizada.
